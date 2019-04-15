@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import imageSource from './red_dot.png';
 
 export default class Map extends Component{
   constructor() {
@@ -21,7 +22,8 @@ export default class Map extends Component{
       profileId: 0,
       address: '',
       date: '',
-      info: ''
+      info: '',
+      markerImage: {}
     }
   }
 
@@ -33,19 +35,25 @@ export default class Map extends Component{
       level: 4
     });
 
+    const imageSize = new window.daum.maps.Size(20, 22);
+    const imageOption = { offset : new window.daum.maps.Point(15, 15)}
+    const markerImage = new window.daum.maps.MarkerImage(imageSource, imageSize, imageOption);
+
+    console.log(markerImage, 'markerImage');
+
     let marker = new window.daum.maps.Marker({
       map: this.state.daumMap,
-      position: daumMap.getCenter()
+      position: daumMap.getCenter(),
+      image: markerImage
     });
 
     let geocoder = new window.daum.maps.services.Geocoder();
 
     this.setState({
-      el, daumMap, marker, geocoder
+      el, daumMap, marker, geocoder, markerImage
     });
 
     marker.setMap(this.state.daumMap);
-
     window.daum.maps.event.addListener(daumMap, 'click', this.handleMapClick);
   }
 
@@ -124,12 +132,12 @@ export default class Map extends Component{
 
   handleDrawMarker(e) {
     e.preventDefault();
-    const { daumMap, info, marker } = this.state;
+    const { daumMap, info, marker, markerImage } = this.state;
 
     console.log(info);
     const addressList = info.split(',');
     console.log(addressList, 'addressList');
-
+    console.log(markerImage, 'image');
 
     for (var i = 0; i < addressList.length; i++) {
       this.state.geocoder.addressSearch(addressList[i], function(result, status) {
@@ -137,7 +145,8 @@ export default class Map extends Component{
           let coords = new window.daum.maps.LatLng(result[0].y, result[0].x);
           console.log(coords.ib, 'coords');
           let tmpMarker = new window.daum.maps.Marker({
-            position: coords
+            position: coords,
+            image: markerImage
           });
           tmpMarker.setMap(daumMap);
         }
