@@ -12,6 +12,7 @@ export default class Map extends Component{
     this.handleInfoChange = this.handleInfoChange.bind(this);
     this.handleAddressChange = this.handleAddressChange.bind(this);
     this.handleDrawMarker = this.handleDrawMarker.bind(this);
+    // this.handleDraw = this.handleDraw.bind(this);
     this.state = {
       el: '',
       daumMap: '',
@@ -31,11 +32,11 @@ export default class Map extends Component{
 
     let el = document.getElementById('map');
     let daumMap = new window.daum.maps.Map(el, {
-      center: new window.daum.maps.LatLng(37.401, 127.109),
-      level: 4
+      center: new window.daum.maps.LatLng(37.52648259543062, 126.86435765802705),
+      level: 6
     });
 
-    const imageSize = new window.daum.maps.Size(20, 22);
+    const imageSize = new window.daum.maps.Size(12, 13);
     const imageOption = { offset : new window.daum.maps.Point(15, 15)}
     const markerImage = new window.daum.maps.MarkerImage(imageSource, imageSize, imageOption);
 
@@ -132,26 +133,40 @@ export default class Map extends Component{
 
   handleDrawMarker(e) {
     e.preventDefault();
-    const { daumMap, info, marker, markerImage } = this.state;
+    const { daumMap, info, geocoder, markerImage } = this.state;
 
     console.log(info);
     const addressList = info.split(',');
     console.log(addressList, 'addressList');
-    console.log(markerImage, 'image');
-
-    for (var i = 0; i < addressList.length; i++) {
-      this.state.geocoder.addressSearch(addressList[i], function(result, status) {
+    const errorList = [];
+    // console.log(markerImage, 'image');
+    const history = new Array();
+    addressList.forEach(function(value, i) {
+      geocoder.addressSearch(value, function(result, status) {
         if (status === window.daum.maps.services.Status.OK) {
           let coords = new window.daum.maps.LatLng(result[0].y, result[0].x);
-          console.log(coords.ib, 'coords');
+          if (history.includes(coords.ib)) {
+            console.log('중복발견');
+          }
+          console.log(coords.ib, 'coords' + i);
+
+          // if (history.contains(coords.ib)) {
+          //   console.log("중복발견");
+          // }
+          history.push(coords.ib);
+
           let tmpMarker = new window.daum.maps.Marker({
             position: coords,
             image: markerImage
           });
           tmpMarker.setMap(daumMap);
+        } else {
+          console.log(value, "실패" + i);
+          errorList.push(value);
         }
       });
-    }
+    });
+
     // this.state.geocoder.addressSearch(info, function(result, status) {
     //   if (status === window.daum.maps.services.Status.OK) {
     //     let coords = new window.daum.maps.LatLng(result[0].y, result[0].x);
@@ -162,6 +177,42 @@ export default class Map extends Component{
     //   }
     // });
   }
+
+  // handleDraw() {
+  //   const { daumMap, info, geocoder, markerImage } = this.state;
+
+  //   console.log(info);
+  //   const addressList = info.split(',');
+  //   console.log(addressList, 'addressList');
+  //   const errorList = [];
+  //   // console.log(markerImage, 'image');
+  //   const history = new Array();
+  //   addressList.forEach(function(value, i) {
+  //     geocoder.addressSearch(value, function(result, status) {
+  //       if (status === window.daum.maps.services.Status.OK) {
+  //         let coords = new window.daum.maps.LatLng(result[0].y, result[0].x);
+  //         if (history.includes(coords.ib)) {
+  //           console.log('중복발견');
+  //         }
+  //         console.log(coords.ib, 'coords' + i);
+
+  //         // if (history.contains(coords.ib)) {
+  //         //   console.log("중복발견");
+  //         // }
+  //         history.push(coords.ib);
+
+  //         let tmpMarker = new window.daum.maps.Marker({
+  //           position: coords,
+  //           image: markerImage
+  //         });
+  //         tmpMarker.setMap(daumMap);
+  //       } else {
+  //         console.log(value, "실패" + i);
+  //         errorList.push(value);
+  //       }
+  //     });
+  //   });
+  // }
 
   render() {
     const mapStyle = {
