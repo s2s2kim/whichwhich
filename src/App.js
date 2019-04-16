@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import Map from './Component/Map';
+import Map from './Component/WhichMap';
 
 class App extends Component {
   render() {

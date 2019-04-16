@@ -1,7 +1,31 @@
 import React, { Component } from 'react';
-import imageSource from './red_dot.png';
+import redDot1 from '../red_dot.png';
+import redDot2 from '../red_dot2.png';
+import redDot3 from '../red_dot3.png';
+import redDot4 from '../red_dot4.png';
+import redDot5 from '../red_dot5.png';
 
-export default class Map extends Component{
+
+const imageSize = new window.daum.maps.Size(18, 20);
+const imageOption = { offset : new window.daum.maps.Point(15, 15)}
+
+function getCoordsHash(coords) {
+  return coords.ib * 3 + coords.jb * 1004;
+}
+
+function getMarkerImageSource(count) {
+  if (count === 2) {
+    return redDot2;
+  } else if (count === 3) {
+    return redDot3;
+  } else if (count === 4) {
+    return redDot4;
+  } else {
+    return redDot5;
+  }
+}
+
+export default class WhichMap extends Component{
   constructor() {
     super();
     this.setMarker = this.setMarker.bind(this);
@@ -36,9 +60,9 @@ export default class Map extends Component{
       level: 6
     });
 
-    const imageSize = new window.daum.maps.Size(12, 13);
-    const imageOption = { offset : new window.daum.maps.Point(15, 15)}
-    const markerImage = new window.daum.maps.MarkerImage(imageSource, imageSize, imageOption);
+    // const imageSize = new window.daum.maps.Size(12, 13);
+    // const imageOption = { offset : new window.daum.maps.Point(15, 15)}
+    const markerImage = new window.daum.maps.MarkerImage(redDot1, imageSize, imageOption);
 
     console.log(markerImage, 'markerImage');
 
@@ -141,41 +165,98 @@ export default class Map extends Component{
     const errorList = [];
     // console.log(markerImage, 'image');
     const history = new Array();
-    addressList.forEach(function(value, i) {
-      geocoder.addressSearch(value, function(result, status) {
-        if (status === window.daum.maps.services.Status.OK) {
-          let coords = new window.daum.maps.LatLng(result[0].y, result[0].x);
-          if (history.includes(coords.ib)) {
-            console.log('중복발견');
+    var coordsMap = new Map();
+    coordsMap.set('hello', 'bonjour');
+
+
+    let processes = addressList.map((address) => {
+      return new Promise((resolve) => {
+        geocoder.addressSearch(address, function(result, status) {
+          if (status === window.daum.maps.services.Status.OK) {
+            let coords = new window.daum.maps.LatLng(result[0].y, result[0].x);
+            if (history.includes(coords.ib)) {
+              console.log('중복발견');
+            }
+            console.log(coords.ib, 'coords');
+  
+            let tmpMarker = {};
+            // if (history.includes(getCoordsHash(coords))) {
+            //   console.log("중복발견");
+            //   const newMarkerImage = new window.daum.maps.MarkerImage(redDot2, imageSize, imageOption);
+              
+            //   tmpMarker = new window.daum.maps.Marker({
+            //     position: coords,
+            //     image: newMarkerImage
+            //   });
+            // } else {
+            //   history.push(getCoordsHash(coords));
+            //   tmpMarker = new window.daum.maps.Marker({
+            //     position: coords,
+            //     image: markerImage
+            //   });
+            // }
+
+            if (coordsMap.get(getCoordsHash(coords)) !== undefined) {
+              console.log("중복발견");
+
+              var newCount = coordsMap.get(getCoordsHash(coords)) + 1;
+              coordsMap.set(getCoordsHash(coords), newCount);
+              const newMarkerImage = new window.daum.maps.MarkerImage(getMarkerImageSource(newCount), imageSize, imageOption);
+              
+              tmpMarker = new window.daum.maps.Marker({
+                position: coords,
+                image: newMarkerImage
+              });
+            } else {
+              coordsMap.set(getCoordsHash(coords), 1);
+              tmpMarker = new window.daum.maps.Marker({
+                position: coords,
+                image: markerImage
+              });
+            }
+  
+            tmpMarker.setMap(daumMap);
+            resolve();
+          } else {
+            console.log(address, "실패");
+            errorList.push(address);
+            resolve();
           }
-          console.log(coords.ib, 'coords' + i);
-
-          // if (history.contains(coords.ib)) {
-          //   console.log("중복발견");
-          // }
-          history.push(coords.ib);
-
-          let tmpMarker = new window.daum.maps.Marker({
-            position: coords,
-            image: markerImage
-          });
-          tmpMarker.setMap(daumMap);
-        } else {
-          console.log(value, "실패" + i);
-          errorList.push(value);
-        }
-      });
+        });
+      })
     });
 
-    // this.state.geocoder.addressSearch(info, function(result, status) {
-    //   if (status === window.daum.maps.services.Status.OK) {
-    //     let coords = new window.daum.maps.LatLng(result[0].y, result[0].x);
-    //     console.log(coords.ib, 'coords');
-    
-    //     marker.setMap(daumMap);
-    //     marker.setPosition(coords);
-    //   }
+    Promise.all(processes).then(() => {
+      console.log(history, 'history');
+      console.log(coordsMap, 'coordsMap');
+    });
+
+    // addressList.forEach(function(value, i) {
+    //   geocoder.addressSearch(value, function(result, status) {
+    //     if (status === window.daum.maps.services.Status.OK) {
+    //       let coords = new window.daum.maps.LatLng(result[0].y, result[0].x);
+    //       if (history.includes(coords.ib)) {
+    //         console.log('중복발견');
+    //       }
+    //       console.log(coords.ib, 'coords' + i);
+
+    //       // if (history.contains(coords.ib)) {
+    //       //   console.log("중복발견");
+    //       // }
+    //       history.push(coords.ib);
+
+    //       let tmpMarker = new window.daum.maps.Marker({
+    //         position: coords,
+    //         image: markerImage
+    //       });
+    //       tmpMarker.setMap(daumMap);
+    //     } else {
+    //       console.log(value, "실패" + i);
+    //       errorList.push(value);
+    //     }
+    //   });
     // });
+
   }
 
   // handleDraw() {
