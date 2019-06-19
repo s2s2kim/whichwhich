@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import redDot1 from '../red_dot.png';
-import redDot2 from '../red_dot2.png';
-import redDot3 from '../red_dot3.png';
-import redDot4 from '../red_dot4.png';
-import redDot5 from '../red_dot5.png';
+import redDot1 from '../images/red_dot.png';
+import redDot2 from '../images/red_dot2.png';
+import redDot3 from '../images/red_dot3.png';
+import redDot4 from '../images/red_dot4.png';
+import redDot5 from '../images/red_dot5.png';
 
 
 const imageSize = new window.daum.maps.Size(18, 20);
@@ -31,12 +31,10 @@ export default class WhichMap extends Component{
     this.setMarker = this.setMarker.bind(this);
     this.handleMapClick = this.handleMapClick.bind(this);
     this.searchAddress = this.searchAddress.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleDateChange = this.handleDateChange.bind(this);
-    this.handleInfoChange = this.handleInfoChange.bind(this);
+    this.handleInfoChange1 = this.handleInfoChange1.bind(this);
     this.handleAddressChange = this.handleAddressChange.bind(this);
     this.handleDrawMarker = this.handleDrawMarker.bind(this);
-    // this.handleDraw = this.handleDraw.bind(this);
+
     this.state = {
       el: '',
       daumMap: '',
@@ -47,7 +45,10 @@ export default class WhichMap extends Component{
       profileId: 0,
       address: '',
       date: '',
-      info: '',
+      info1: '',
+      info2: '',
+      info3: '',
+      info4: '',
       markerImage: {}
     }
   }
@@ -104,39 +105,50 @@ export default class WhichMap extends Component{
     })
   }
 
-  handleSubmit(e) {
-    e.preventDefault();
-    const { date, latitude, longitude, profileId, address, info } = this.state;
+  // handleSubmit(e) {
+  //   e.preventDefault();
+  //   const { date, latitude, longitude, profileId, address, info } = this.state;
     
-    const url = `/api/report/missing-person/${profileId}`;
+  //   const url = `/api/report/missing-person/${profileId}`;
     
-    fetch(url, {
-      method: 'post',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        "witnessAddress" : address,
-        "witnessedAt": date,
-        "latitude": latitude, 
-        "longitude": longitude,
-        "description": info
-      }),
-    }).then(res => {
-      if(res.status === 200) {
-        window.location.href=`/person/${profileId}`;
-      }
-    });
-  }
+  //   fetch(url, {
+  //     method: 'post',
+  //     headers: {'Content-Type':'application/json'},
+  //     body: JSON.stringify({
+  //       "witnessAddress" : address,
+  //       "witnessedAt": date,
+  //       "latitude": latitude, 
+  //       "longitude": longitude,
+  //       "description": info
+  //     }),
+  //   }).then(res => {
+  //     if(res.status === 200) {
+  //       window.location.href=`/person/${profileId}`;
+  //     }
+  //   });
+  // }
 
-  handleInfoChange(e) {
-    console.log(e.target.value);
+  handleInfoChange1(e) {
     this.setState({
-      info: e.target.value
+      info1: e.target.value
     })
   }
 
-  handleDateChange(e) {
+  handleInfoChange2(e) {
     this.setState({
-      date: e.target.value
+      info2: e.target.value
+    })
+  }
+
+  handleInfoChange3(e) {
+    this.setState({
+      info3: e.target.value
+    })
+  }
+
+  handleInfoChange4(e) {
+    this.setState({
+      info4: e.target.value
     })
   }
 
@@ -157,10 +169,10 @@ export default class WhichMap extends Component{
 
   handleDrawMarker(e) {
     e.preventDefault();
-    const { daumMap, info, geocoder, markerImage } = this.state;
+    const { daumMap, info1, geocoder, markerImage } = this.state;
 
-    console.log(info);
-    const addressList = info.split(',');
+    console.log(info1);
+    const addressList = info1.split(',');
     console.log(addressList, 'addressList');
     const errorList = [];
     // console.log(markerImage, 'image');
@@ -259,46 +271,11 @@ export default class WhichMap extends Component{
 
   }
 
-  // handleDraw() {
-  //   const { daumMap, info, geocoder, markerImage } = this.state;
-
-  //   console.log(info);
-  //   const addressList = info.split(',');
-  //   console.log(addressList, 'addressList');
-  //   const errorList = [];
-  //   // console.log(markerImage, 'image');
-  //   const history = new Array();
-  //   addressList.forEach(function(value, i) {
-  //     geocoder.addressSearch(value, function(result, status) {
-  //       if (status === window.daum.maps.services.Status.OK) {
-  //         let coords = new window.daum.maps.LatLng(result[0].y, result[0].x);
-  //         if (history.includes(coords.ib)) {
-  //           console.log('중복발견');
-  //         }
-  //         console.log(coords.ib, 'coords' + i);
-
-  //         // if (history.contains(coords.ib)) {
-  //         //   console.log("중복발견");
-  //         // }
-  //         history.push(coords.ib);
-
-  //         let tmpMarker = new window.daum.maps.Marker({
-  //           position: coords,
-  //           image: markerImage
-  //         });
-  //         tmpMarker.setMap(daumMap);
-  //       } else {
-  //         console.log(value, "실패" + i);
-  //         errorList.push(value);
-  //       }
-  //     });
-  //   });
-  // }
 
   render() {
     const mapStyle = {
       width: '100%',
-      height: '500px',
+      height: '700px',
       overflow: 'hidden',
       margin: '15px 0',
     }
@@ -308,22 +285,37 @@ export default class WhichMap extends Component{
       <form style={{width: "80vw"}}>
         <div class="ui divider"></div>
         <div>
-          <h3>장소</h3>
           <div id="map" style={mapStyle}>
           </div>
           <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', }}>
-          <div class="ui input" style={{margin: '15px 0'}}>
-            <input id="search_address" style={{width: "80%"}}type="text" onChange={this.handleAddressChange} placeholder="도로명 주소를 입력해 주세요"/>
+          <div class="form-group col-md-12" style={{margin: '15px 0'}}>
+            <input id="search_address" style={{width: "80%"}}type="text" onChange={this.handleAddressChange} placeholder="지도 중심 기준이 될 도로명 주소를 입력해 주세요"/>
             <button class="ui primary basic button" onClick={this.searchAddress}>></button>
           </div>
           </div>
         </div>
         <div class="ui divider"></div>
-        <div class="field" style={{margin: "20px 0"}}>
-          <h3 style={{marginBottom: "20px"}}>주소 목록</h3>
-          <textarea onChange={this.handleInfoChange}></textarea>
+        <div class="form-row" style={{margin: "20px 0"}}>
+          <div class="form-group col-md-6">
+            <h3 style={{marginBottom: "20px"}}>주소 목록 <span class="badge badge-pill badge-danger">red</span></h3>
+            <textarea onChange={this.handleInfoChange1} style={{width: "100%", height: "150px"}}></textarea>
+          </div>
+          <div class="form-group col-md-6">
+            <h3 style={{marginBottom: "20px"}}>주소 목록 <span class="badge badge-pill badge-primary">blue</span></h3>
+            <textarea onChange={this.handleInfoChange2} style={{width: "100%", height: "150px"}}></textarea>
+          </div>
         </div>
-        <span class="" style={{marginBottom: '50px'}}><button onClick={this.handleDrawMarker}>표시하기</button></span>
+        <div class="form-row" style={{margin: "20px 0"}}>
+          <div class="form-group col-md-6">
+            <h3 style={{marginBottom: "20px"}}>주소 목록 <span class="badge badge-pill badge-success">green</span></h3>
+            <textarea onChange={this.handleInfoChange3} style={{width: "100%", height: "150px"}}></textarea>
+          </div>
+          <div class="form-group col-md-6">
+            <h3 style={{marginBottom: "20px"}}>주소 목록 <span class="badge badge-pill badge-dark">dark</span></h3>
+            <textarea onChange={this.handleInfoChange4} style={{width: "100%", height: "150px"}}></textarea>
+          </div>
+        </div>
+        <button class="btn btn-primary" onClick={this.handleDrawMarker}><b>표시하기</b></button>
       </form>
     </div>
     );
