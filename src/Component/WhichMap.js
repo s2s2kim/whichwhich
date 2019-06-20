@@ -9,6 +9,16 @@ import blueDot2 from '../images/blue_dot2.png';
 import blueDot3 from '../images/blue_dot3.png';
 import blueDot4 from '../images/blue_dot4.png';
 import blueDot5 from '../images/blue_dot5.png';
+import greenDot1 from '../images/green_dot.png';
+import greenDot2 from '../images/green_dot2.png';
+import greenDot3 from '../images/green_dot3.png';
+import greenDot4 from '../images/green_dot4.png';
+import greenDot5 from '../images/green_dot5.png';
+import darkDot1 from '../images/dark_dot.png';
+import darkDot2 from '../images/dark_dot2.png';
+import darkDot3 from '../images/dark_dot3.png';
+import darkDot4 from '../images/dark_dot4.png';
+import darkDot5 from '../images/dark_dot5.png';
 
 
 
@@ -25,6 +35,12 @@ function getMarkerImageBase(index) {
     return redDot1;
   } else if (index === 1) {
     return blueDot1;
+  } else if (index === 2) {
+    return greenDot1;
+  } else if (index === 3) {
+    return darkDot1;
+  } else {
+    return redDot1;
   }
 
 }
@@ -50,6 +66,28 @@ function getMarkerImageSource(index, count) {
     } else {
       return blueDot5;
     }
+  } else if (index === 2) {
+    if (count === 2) {
+      return greenDot2;
+    } else if (count === 3) {
+      return greenDot3;
+    } else if (count === 4) {
+      return greenDot4;
+    } else {
+      return greenDot5;
+    }
+  } else if (index === 3) {
+    if (count === 2) {
+      return darkDot2;
+    } else if (count === 3) {
+      return darkDot3;
+    } else if (count === 4) {
+      return darkDot4;
+    } else {
+      return darkDot5;
+    }
+  } else {
+    return redDot1;
   }
 }
 
@@ -200,18 +238,21 @@ export default class WhichMap extends Component{
 
   handleDrawMarker(e) {
     e.preventDefault();
-    const { daumMap, info1, info2, geocoder, markerImage } = this.state;
+    const { daumMap, info1, info2, info3, info4, geocoder, markerImage } = this.state;
 
     console.log(info1);
     console.log(info2);
     const addressList = info1.split(',');
     const addressList2 = info2.split(',');
+    const addressList3 = info3.split(',');
+    const addressList4 = info4.split(',');
+    
     console.log(addressList, 'addressList');
     const errorList = [];
     // console.log(markerImage, 'image');
     const history = new Array();
     var coordsMap = new Map();
-    const hop = Array.of(addressList, addressList2);
+    const hop = Array.of(addressList, addressList2, addressList3, addressList4);
     console.log(hop);
     coordsMap.set('hello', 'bonjour');
 
